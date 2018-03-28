@@ -1,0 +1,47 @@
+---
+title: Test Post
+author: Andrew Kostandy
+date: '2018-03-28'
+slug: test-post
+categories: []
+tags:
+  - r
+  - python
+---
+
+
+
+<p>This is a test post.</p>
+<p>Some random text: This will show up in the summary under the post title. This post was written in R Markdown. It shows that the functionality of using R and Python code in R Markdown works well. The output is rendering successfully and the code highlighting looks good. It’s also really easy to update a post and the process is seamless.</p>
+<p>Here’s a random equation: <span class="math inline">\(y=\frac{x^2 + 55x-4}{14}\)</span></p>
+<div id="r-code" class="section level1">
+<h1>R Code</h1>
+<pre class="r"><code>library(tidyverse)</code></pre>
+<pre class="r"><code>ggplot(mtcars, aes(mpg,hp)) + geom_point()</code></pre>
+<p><img src="/post/test-post_files/figure-html/unnamed-chunk-2-1.png" width="672" /></p>
+</div>
+<div id="python-code" class="section level1">
+<h1>Python Code</h1>
+<pre class="python"><code>import numpy as np
+import pandas as pd
+import matplotlib.pyplot as plt
+import seaborn as sb
+from ggplot import *</code></pre>
+<pre class="python"><code>x = np.arange(0,10)
+print(x)</code></pre>
+<pre><code>## [0 1 2 3 4 5 6 7 8 9]</code></pre>
+<pre class="python"><code>df2 = pd.DataFrame({
+      &#39;Country&#39;:pd.Categorical([&quot;China&quot;,&quot;China&quot;,&quot;China&quot;,&quot;China&quot;,&quot;China&quot;,&quot;China&quot;,
+                                &quot;China&quot;,&quot;China&quot;,&quot;US&quot;,&quot;US&quot;,&quot;US&quot;,&quot;US&quot;,&quot;US&quot;,&quot;US&quot;,
+                                &quot;US&quot;,&quot;US&quot;]),
+      &#39;Gender&#39;:pd.Categorical([&quot;M&quot;,&quot;M&quot;,&quot;M&quot;,&quot;M&quot;,&quot;F&quot;,&quot;F&quot;,&quot;F&quot;,&quot;F&quot;,&quot;M&quot;,&quot;M&quot;,&quot;M&quot;,&quot;M&quot;,
+                               &quot;F&quot;,&quot;F&quot;,&quot;F&quot;,&quot;F&quot;]), 
+      &#39;Values&#39; : np.array([1,2,2,4,2,3,3,5,1,5,3,6,4,6,3,7])
+      })
+      
+plt.figure()
+sb.violinplot(x=&quot;Country&quot;, y=&quot;Values&quot;, hue=&quot;Gender&quot;,
+              palette=&quot;muted&quot;, split=True, data=df2)
+plt.show()</code></pre>
+<p><img src="/post/test-post_files/figure-html/unnamed-chunk-6-1.png" width="576" /></p>
+</div>
