@@ -13,7 +13,8 @@ weight = 4
     "Data Science",
     "Machine Learning",
     "Statistics",
-    "Data Vizualization"
+    "Decision Analytics",
+    "Data Visualization"
   ]
 
 # List your qualifications (such as academic degrees).
