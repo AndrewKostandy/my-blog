@@ -22,7 +22,7 @@ weight = 4
 [[education.courses]]
   course = "Master of Science in Data Science"
   institution = "Northwestern University"
-  year = 2020
+  year = 2019
 
 [[education.courses]]
   course = "Professional Graduate-Level Certificate in Data Science"
