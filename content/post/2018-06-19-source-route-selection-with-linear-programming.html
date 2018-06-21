@@ -1,0 +1,333 @@
+---
+title: Supply Source & Route Selection with Linear Programming
+author: Andrew Kostandy
+date: '2018-06-19'
+slug: supply-source-and-route-selection-with-linear-programming
+categories: []
+tags:
+  - python
+  - gurobi
+  - decision analytics
+  - linear programming
+  - network modeling
+header:
+  caption: ''
+  image: ''
+---
+
+<script src="/rmarkdown-libs/kePrint/kePrint.js"></script>
+
+
+<p>Businesses face various types of problems that require making optimal decisions in order to achieve a certain objective. In this post, I will discuss a supply source &amp; route selection problem scenario and how network modeling with linear programming can be used to identify the optimal decisions that would minimize the cost of shipping. I will use Gurobi Python to model &amp; solve this problem.</p>
+<p>An electronics company has decided to build 3 factories for its flagship product. There are 4 cities being considered as locations for those factories — Boston, Miami, Seattle, and Los Angeles. A maximum of one factory can be built in a city and each factory option has a different production capacity.</p>
+<p>Additionally, the company has identified 4 cities with high demand for its products — Minneapolis, Chicago, Denver, and Dallas. The shipping cost per unit differs depending on the origin &amp; destination cities.</p>
+<p>The production capacities, demand levels, &amp; shipping costs are in the table below:</p>
+<table>
+<thead>
+<tr>
+<th style="border-bottom:hidden" colspan="1">
+</th>
+<th style="border-bottom:hidden; padding-bottom:0; padding-left:3px;padding-right:3px;text-align: center; " colspan="4">
+<div style="border-bottom: 1px solid #ddd; padding-bottom: 5px;">
+Factory Options
+</div>
+</th>
+<th style="border-bottom:hidden" colspan="1">
+</th>
+</tr>
+<tr>
+<th style="text-align:left;">
+Shops
+</th>
+<th style="text-align:right;">
+Boston
+</th>
+<th style="text-align:right;">
+Miami
+</th>
+<th style="text-align:right;">
+Seattle
+</th>
+<th style="text-align:right;">
+Los Angeles
+</th>
+<th style="text-align:right;">
+Demand
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+Minneapolis
+</td>
+<td style="text-align:right;">
+$20
+</td>
+<td style="text-align:right;">
+$24
+</td>
+<td style="text-align:right;">
+$22
+</td>
+<td style="text-align:right;">
+$26
+</td>
+<td style="text-align:right;">
+4500
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Chicago
+</td>
+<td style="text-align:right;">
+$18
+</td>
+<td style="text-align:right;">
+$20
+</td>
+<td style="text-align:right;">
+$23
+</td>
+<td style="text-align:right;">
+$24
+</td>
+<td style="text-align:right;">
+7000
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Denver
+</td>
+<td style="text-align:right;">
+$24
+</td>
+<td style="text-align:right;">
+$25
+</td>
+<td style="text-align:right;">
+$16
+</td>
+<td style="text-align:right;">
+$15
+</td>
+<td style="text-align:right;">
+4500
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Dallas
+</td>
+<td style="text-align:right;">
+$23
+</td>
+<td style="text-align:right;">
+$17
+</td>
+<td style="text-align:right;">
+$23
+</td>
+<td style="text-align:right;">
+$17
+</td>
+<td style="text-align:right;">
+5500
+</td>
+</tr>
+<tr>
+<td style="text-align:left;font-weight: bold;">
+Production
+</td>
+<td style="text-align:right;font-weight: bold;">
+3500
+</td>
+<td style="text-align:right;font-weight: bold;">
+5000
+</td>
+<td style="text-align:right;font-weight: bold;">
+4000
+</td>
+<td style="text-align:right;font-weight: bold;">
+6000
+</td>
+<td style="text-align:right;font-weight: bold;">
+</td>
+</tr>
+</tbody>
+</table>
+<p>Notice that the total demand of the demand cities exceeds the total supply of all 4 potential factories of which we can only select 3.</p>
+<p>We need to decide which 3 cities should be selected for the factories as well as which routes should be used from each of them (&amp; the number of units to ship) in order to minimize the cost of shipping while meeting as much of the demand as possible.</p>
+<p>The information in the above table can be visualized as a network plot. The production capacity values of the supply nodes are represented by negative values while the demand values of the demand cities are represented by positive values.</p>
+<div class="figure">
+<img src="/post/2018-06-19-source-route-selection-with-linear-programming_files/network_plot.png" />
+
+</div>
+<p>Note that we’re not just trying to distribute our supply at the cheapest cost possible but rather trying to meet as much of the demand as possible with the least shipping costs.</p>
+<p>If we try to solve this problem directly and minimize shipping costs, the model might prefer factories with smaller production capacities since distributing their supply may result in lower shipping costs. However, that would meet less of the demand, and our objective will not be achieved. To meet as much of the demand as possible at the lowest possible cost, we need to introduce an artificial supply node with an arbitrarily large supply quantity and large shipping cost per unit for all its possible routes. This addition makes our total supply exceed the total demand and would therefore force the model to fill as much of the demand as possible and would use the supply from the artificial node when it absolutely needs it (since it has very high costs). We can then ignore the parts of the solution related to the artificial supply node and its routes but use the remaining parts of the solution.</p>
+<p>The new network model is shown below:</p>
+<div class="figure">
+<img src="/post/2018-06-19-source-route-selection-with-linear-programming_files/network_plot2.png" />
+
+</div>
+<div id="mathematical-formulation-model-building" class="section level2">
+<h2>Mathematical Formulation &amp; Model Building</h2>
+<p>Let’s formulate the model mathematically and build the model with Gurobi Python.</p>
+<div id="decision-variables" class="section level3">
+<h3>Decision Variables</h3>
+<p>There are two groups of decision variables needed here. First, a group of binary decision variables, one for each of the supply cities that would take a value of 1 if that city is selected and 0 otherwise. Second, a group of integer decision variables that represent the number of units to send for each possible route. If that value is 0, then the route will not be used. This can be represented mathematically as:</p>
+<p><span class="math inline">\(y_i ~\forall ~i \in \{1,2,3,4\}\)</span>: Binary variables that equal 1 if if node <span class="math inline">\(i\)</span> is selected as a supply node.</p>
+<p><span class="math inline">\(x_{ij} ~\forall ~i \in \{1,2,3,4,9\}, ~j \in \{5,6,7,8\}\)</span>: The number of units to send from supply node <span class="math inline">\(i\)</span> to demand node <span class="math inline">\(j\)</span>.</p>
+<p>Let’s create those decision variables in our Gurobi Python model:</p>
+<pre class="python"><code>from gurobi import *        
+ 
+m = Model(&quot;M1&quot;) # Setting up the model        
+ 
+# Creating the decision variables
+ 
+y1 = m.addVar(name = &quot;y1&quot;, vtype=GRB.BINARY) # Will node 1 be used for supply? 1/0
+y2 = m.addVar(name = &quot;y2&quot;, vtype=GRB.BINARY) # Will node 2 be used for supply? 1/0
+y3 = m.addVar(name = &quot;y3&quot;, vtype=GRB.BINARY) # Will node 3 be used for supply? 1/0
+y4 = m.addVar(name = &quot;y4&quot;, vtype=GRB.BINARY) # Will node 4 be used for supply? 1/0        
+x15 = m.addVar(name = &quot;x15&quot;, vtype=GRB.INTEGER) # Num. units sent from node 1 to node 5
+x16 = m.addVar(name = &quot;x16&quot;, vtype=GRB.INTEGER) # Num. units sent from node 1 to node 6
+x17 = m.addVar(name = &quot;x17&quot;, vtype=GRB.INTEGER) # Num. units sent from node 1 to node 7
+x18 = m.addVar(name = &quot;x18&quot;, vtype=GRB.INTEGER) # Num. units sent from node 1 to node 8        
+x25 = m.addVar(name = &quot;x25&quot;, vtype=GRB.INTEGER) # Num. units sent from node 2 to node 5
+x26 = m.addVar(name = &quot;x26&quot;, vtype=GRB.INTEGER) # Num. units sent from node 2 to node 6
+x27 = m.addVar(name = &quot;x27&quot;, vtype=GRB.INTEGER) # Num. units sent from node 2 to node 7
+x28 = m.addVar(name = &quot;x28&quot;, vtype=GRB.INTEGER) # Num. units sent from node 2 to node 8        
+x35 = m.addVar(name = &quot;x35&quot;, vtype=GRB.INTEGER) # Num. units sent from node 3 to node 5
+x36 = m.addVar(name = &quot;x36&quot;, vtype=GRB.INTEGER) # Num. units sent from node 3 to node 6
+x37 = m.addVar(name = &quot;x37&quot;, vtype=GRB.INTEGER) # Num. units sent from node 3 to node 7
+x38 = m.addVar(name = &quot;x38&quot;, vtype=GRB.INTEGER) # Num. units sent from node 3 to node 8        
+x45 = m.addVar(name = &quot;x45&quot;, vtype=GRB.INTEGER) # Num. units sent from node 4 to node 5
+x46 = m.addVar(name = &quot;x46&quot;, vtype=GRB.INTEGER) # Num. units sent from node 4 to node 6
+x47 = m.addVar(name = &quot;x47&quot;, vtype=GRB.INTEGER) # Num. units sent from node 4 to node 7
+x48 = m.addVar(name = &quot;x48&quot;, vtype=GRB.INTEGER) # Num. units sent from node 4 to node 8        
+x95 = m.addVar(name = &quot;x95&quot;, vtype=GRB.INTEGER) # Num. units sent from node 9 to node 5
+x96 = m.addVar(name = &quot;x96&quot;, vtype=GRB.INTEGER) # Num. units sent from node 9 to node 6
+x97 = m.addVar(name = &quot;x97&quot;, vtype=GRB.INTEGER) # Num. units sent from node 9 to node 7
+x98 = m.addVar(name = &quot;x98&quot;, vtype=GRB.INTEGER) # Num. units sent from node 9 to node 8        
+m.update() # Updating the model            </code></pre>
+</div>
+<div id="objective-function" class="section level3">
+<h3>Objective Function</h3>
+<p>We need to calculate the product of the cost of shipping per unit for each route by the number of units to be sent on that route and mimize the sum of those values.</p>
+<p>Therefore, the objective function can be expressed mathematically as:</p>
+<p>Minimize: <span class="math inline">\(z = 20x_{15} + 18x_{16} + 24x_{17} + 23x_{18} +\)</span><br />
+<span class="math inline">\(~~~~~~~~~~~~~~~~~~~~~~24x_{25} + 20x_{26} + 25x_{27} + 17x_{28} +\)</span><br />
+<span class="math inline">\(~~~~~~~~~~~~~~~~~~~~~~22x_{35} + 23x_{36} + 16x_{37} + 23x_{38} +\)</span><br />
+<span class="math inline">\(~~~~~~~~~~~~~~~~~~~~~~26x_{45} + 24x_{46} + 15x_{47} + 17x_{48} +\)</span><br />
+<span class="math inline">\(~~~~~~~~~~~~~~~~~~~~~~9999x_{95} + 9999x_{96} + 9999x_{97} + 9999x_{98}\)</span></p>
+<p>Let’s add this objective function to our Gurobi Python model:</p>
+<pre class="python"><code># Setting up the objective function
+m.setObjective(20*x15 + 18*x16 + 24*x17 + 23*x18 + 24*x25 + 20*x26 + 25*x27 + 17*x28 + 22*x35 + 23*x36 + 16*x37 + 23*x38 + 26*x45 + 24*x46 + 15*x47 + 17*x48 + 9999*x95 + 9999*x96 + 9999*x97 + 9999*x98, GRB.MINIMIZE)        
+ 
+m.update() # Updating the model            </code></pre>
+</div>
+<div id="constraints" class="section level3">
+<h3>Constraints</h3>
+<div id="balance-of-flow-constraints" class="section level4">
+<h4>Balance of Flow Constraints</h4>
+<p>This constraints group ensures a balance of flow in our network. Since our total supply now exceeds the total demand, we need to place a constraint for each node such that its Inflow - Outflow <span class="math inline">\(\ge\)</span> its Supply or Demand.</p>
+<p>In our case, all the supply nodes have only outflow and all of our demand nodes have only inflow.</p>
+<p><span class="math inline">\(-x_{15} - x_{16} - x_{17} - x_{18} \ge -3500\)</span> <span class="math inline">\(~~~~~~~~~~~~\)</span>} Node 1 <span class="math inline">\(-x_{25} - x_{26} - x_{27} - x_{28} \ge -5000\)</span> <span class="math inline">\(~~~~~~~~~~~~\)</span>} Node 2 <span class="math inline">\(-x_{35} - x_{36} - x_{37} - x_{38} \ge -4000\)</span> <span class="math inline">\(~~~~~~~~~~~~\)</span>} Node 3 <span class="math inline">\(-x_{45} - x_{46} - x_{47} - x_{48} \ge -6000\)</span> <span class="math inline">\(~~~~~~~~~~~~\)</span>} Node 4</p>
+<p><span class="math inline">\(x_{15} + x_{25} + x_{35} + x_{45} + x_{95} \ge 4500\)</span> <span class="math inline">\(~~~~~~~~\)</span>} Node 5 <span class="math inline">\(x_{16} + x_{26} + x_{36} + x_{46} + x_{96} \ge 7000\)</span> <span class="math inline">\(~~~~~~~~\)</span>} Node 6 <span class="math inline">\(x_{17} + x_{27} + x_{37} + x_{47} + x_{97} \ge 4500\)</span> <span class="math inline">\(~~~~~~~~\)</span>} Node 7 <span class="math inline">\(x_{18} + x_{28} + x_{38} + x_{48} + x_{98} \ge 5500\)</span> <span class="math inline">\(~~~~~~~~\)</span>} Node 8</p>
+<p><span class="math inline">\(-x_{95} - x_{96} - x_{97} - x_{98} \ge -99999\)</span> <span class="math inline">\(~~~~~~~~~~\)</span>} Node 9 (Artificial Supply Node)</p>
+</div>
+<div id="selection-of-supply-nodes-constraints" class="section level4">
+<h4>Selection of Supply Nodes Constraints</h4>
+<p>Since we need to select 3 supply nodes out of 4, we need constraints on those nodes to ensure that each of their respective binary decision variables gets set to 1 if any of its supplies are sent on any routes to the demand nodes. This is done by using the equation Outflow + Supply*Binary Var <span class="math inline">\(\le0\)</span> for each supply node.</p>
+<p><span class="math inline">\(x_{15} + x_{16} + x_{17} + x_{18} -3500y_1 \le 0\)</span> <span class="math inline">\(~~~~~~~~\)</span>} Node 1 Binary <span class="math inline">\(x_{25} + x_{26} + x_{27} + x_{28} -5000y_2 \le 0\)</span> <span class="math inline">\(~~~~~~~~\)</span>} Node 2 Binary <span class="math inline">\(x_{35} + x_{36} + x_{37} + x_{38} -4000y_3 \le 0\)</span> <span class="math inline">\(~~~~~~~~\)</span>} Node 3 Binary <span class="math inline">\(x_{45} + x_{46} + x_{47} + x_{48} -6000y_4 \le 0\)</span> <span class="math inline">\(~~~~~~~~\)</span>} Node 4 Binary</p>
+<p>Looking at the above inequalities, note that since supply is a negative number, this forces the binary variable for a supply node to become 1 if any of that node’s routes is set to carry any units.</p>
+<p>Next, to ensure that 3 supply nodes only are selected we need to add the following constraint:</p>
+<p><span class="math inline">\(y_1 + y_2 + y_3 + y_4 = 3\)</span></p>
+<p>Let’s add all those constraints to our Gurobi Python model:</p>
+<pre class="python"><code># Adding the constraints to the model
+m.addConstr(-x15 - x16 - x17 - x18&gt;=-3500, &quot;c1&quot;) # Constraint for node 1
+m.addConstr(-x25 - x26 - x27 - x28&gt;=-5000, &quot;c2&quot;) # Constraint for node 2
+m.addConstr(-x35 - x36 - x37 - x38&gt;=-4000, &quot;c3&quot;) # Constraint for node 3
+m.addConstr(-x45 - x46 - x47 - x48&gt;=-6000, &quot;c4&quot;) # Constraint for node 4
+ 
+m.addConstr(x15 + x25 + x35 + x45 + x95&gt;=4500, &quot;c5&quot;) # Constraint for node 5
+m.addConstr(x16 + x26 + x36 + x46 + x96&gt;=7000, &quot;c6&quot;) # Constraint for node 6
+m.addConstr(x17 + x27 + x37 + x47 + x97&gt;=4500, &quot;c7&quot;) # Constraint for node 7
+m.addConstr(x18 + x28 + x38 + x48 + x98&gt;=5500, &quot;c8&quot;) # Constraint for node 8
+ 
+m.addConstr(-x95 - x96 - x97 - x98&gt;=-99999, &quot;c9&quot;) # Constraint for node 9
+ 
+# Setting the binary var. y1 to 1 if either x15, x16, x17, or x18 are &gt;= 0 else it&#39;s 0
+m.addConstr(x15 + x16 + x17 + x18 -3500*y1&lt;=0, &quot;c10&quot;)        
+ 
+# Setting the binary var. y2 to 1 if either x25, x26, x27, or x28 are &gt;= 0 else it&#39;s 0
+m.addConstr(x25 + x26 + x27 + x28 -5000*y2&lt;=0, &quot;c11&quot;)        
+ 
+# Setting the binary var. y3 to 1 if either x35, x36, x37, or x38 are &gt;= 0 else it&#39;s 0
+m.addConstr(x35 + x36 + x37 + x38 -4000*y3&lt;=0, &quot;c12&quot;)        
+ 
+# Setting the binary var. y4 to 1 if either x45, x46, x47, or x48 are &gt;= 0 else it&#39;s 0
+m.addConstr(x45 + x46 + x47 + x48 -6000*y4&lt;=0, &quot;c13&quot;)        
+ 
+# Ensuring that 3 of the variables y1, y2, y3 and y4 are equal to 1
+m.addConstr(y1+y2+y3+y4==3, &quot;c14&quot;)        
+ 
+m.update() # Updating the model            </code></pre>
+</div>
+</div>
+</div>
+<div id="results" class="section level2">
+<h2>Results</h2>
+<p>Finally, let’s run the optimization and find the optimal values of our decision variables:</p>
+<pre class="python"><code>m.optimize() # Finding the optimal solution</code></pre>
+<pre><code>## Optimize a model with 14 rows, 24 columns and 64 nonzeros
+## Variable types: 0 continuous, 24 integer (4 binary)
+## Coefficient statistics:
+##   Matrix range     [1e+00, 6e+03]
+##   Objective range  [2e+01, 1e+04]
+##   Bounds range     [1e+00, 1e+00]
+##   RHS range        [3e+00, 1e+05]
+## Found heuristic solution: objective 2.149785e+08
+## Presolve removed 5 rows and 0 columns
+## Presolve time: 0.00s
+## Presolved: 9 rows, 24 columns, 44 nonzeros
+## Variable types: 0 continuous, 24 integer (4 binary)
+## 
+## Root relaxation: objective 6.525850e+07, 15 iterations, 0.00 seconds
+## 
+##     Nodes    |    Current Node    |     Objective Bounds      |     Work
+##  Expl Unexpl |  Obj  Depth IntInf | Incumbent    BestBd   Gap | It/Node Time
+## 
+## *    0     0               0    6.525850e+07 6.5258e+07  0.00%     -    0s
+## 
+## Explored 0 nodes (15 simplex iterations) in 0.00 seconds
+## Thread count was 8 (of 8 available processors)
+## 
+## Solution count 2: 6.52585e+07 2.14978e+08 
+## 
+## Optimal solution found (tolerance 1.00e-04)
+## Best objective 6.525850000000e+07, best bound 6.525850000000e+07, gap 0.0000%</code></pre>
+<pre class="python"><code>m.printAttr(&quot;X&quot;) # Printing the decision variable values</code></pre>
+<pre><code>## 
+##     Variable            X 
+## -------------------------
+##           y2            1 
+##           y3            1 
+##           y4            1 
+##          x26         5000 
+##          x37         4000 
+##          x47          500 
+##          x48         5500 
+##          x95         4500 
+##          x96         2000</code></pre>
+<p>The above solution shows that Miami, Seattle, and Los Angeles (nodes, 2,3,4) have been selected as the 3 supply nodes. We can also see that some routes from those supply nodes were assigned values while others were not. The artificial supply node was also used to fulfill some demand — routes <span class="math inline">\(x_{95}\)</span> and <span class="math inline">\(x_{96}\)</span>. We should ignore the values related to the artificial node as well as the objective function value in the output since the model only used them to be able to fulfill the demand we could not cover with our real supply. Additionally, the results above show that we could not cover Minneapolis as no routes from Miami, Seattle, or Los Angeles to Minneapolis were assigned positive values. It was simply not economical to fulfill Minneapolis’s demand given that the demand of cities closer to the supply nodes would already exhaust the entire supply of the supply nodes. Chicago’s demand was not even fully met.</p>
+<p>The above decision variable values allow us to meet as much of the demand as possible (15000 units) at the lowest cost of shipping: <span class="math inline">\(20*5000 + 16*4000 + 15*500 + 17*5500=\$170,020\)</span>.</p>
+<p>The network given by the solution can be seen in the network plot below:</p>
+<div class="figure">
+<img src="/post/2018-06-19-source-route-selection-with-linear-programming_files/network_plot5.png" />
+
+</div>
+<p>I hope you enjoyed this post. Please leave your comments below.</p>
+</div>
