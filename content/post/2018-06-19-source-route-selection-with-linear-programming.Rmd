@@ -15,7 +15,12 @@ header:
   image: ''
 ---
 
-Businesses face various types of problems that require making optimal decisions in order to achieve a certain objective. In this post, I will discuss a supply source & route selection problem scenario and how network modeling with linear programming can be used to identify the optimal decisions that would minimize the cost of shipping. I will use Gurobi Python to model & solve this problem.
+
+
+Businesses face various types of problems that require making optimal decisions in order to achieve a certain objective. One such problem is the Transportation / Assignment problem I came across when I was reading the excellent "Spreadsheet Modeling and Decision Analysis" book by Cliff T. Ragsdale.
+I found this type of problem interesting because the concept can be generalized to many areas of the business.
+
+In this post, I will discuss a Transportation / Assignment problem scenario where we need to select the optimal supply sources & routes that would meet as much of the demand as possible while minimize the cost of shipping. I will use network modeling & linear programming with Gurobi Python to model & solve this problem.
 
 An electronics company has decided to build 3 factories for its flagship product. There are 4 cities being considered as locations for those factories — Boston, Miami, Seattle, and Los Angeles. A maximum of one factory can be built in a city and each factory option has a different production capacity.
 
@@ -34,17 +39,17 @@ suppressPackageStartupMessages(library(kableExtra))
 
 ```{r, echo=FALSE}
 t <- tribble(
-  ~Shops,           ~Boston,   ~Miami, ~Seattle,          ~`Los Angeles`,           ~Demand,
-  "Minneapolis",      "$20",    "$24",    "$22",        "$26",            "4500",
-  "Chicago",          "$18",    "$20",    "$23",        "$24",            "7000",
-  "Denver",           "$24",    "$25",    "$16",        "$15",            "4500",
-  "Dallas",           "$23",    "$17",    "$23",        "$17",            "5500",
-  "Production",      "3500",    "5000",   "4000",      "6000",                ""
+  ~`Demand Cities`, ~Boston,   ~Miami, ~Seattle,  ~`Los Angeles`,  ~Demand,
+  "Minneapolis",      "$20",    "$24",    "$22",           "$26",   "4500",
+  "Chicago",          "$18",    "$20",    "$23",           "$24",   "7000",
+  "Denver",           "$24",    "$25",    "$16",           "$15",   "4500",
+  "Dallas",           "$23",    "$17",    "$23",           "$17",   "5500",
+  "Supply",          "3500",   "5000",   "4000",          "6000",       ""
 )
 ```
 
 ```{r, echo=FALSE}
-kable(t, align = "lrrrrr") %>% row_spec(5, bold = TRUE) %>% add_header_above(c(" " = 1, "Factory Options" = 4, " " = 1))
+kable(t, align = "lrrrrr") %>% row_spec(5, bold = TRUE) %>% add_header_above(c(" " = 1, "Supply City Options" = 4, " " = 1))
 ```
 
 Notice that the total demand of the demand cities exceeds the total supply of all 4 potential factories of which we can only select 3. 
@@ -177,7 +182,15 @@ Next, to ensure that 3 supply nodes only are selected we need to add the followi
 
 $y_1 + y_2 + y_3 + y_4 = 3$
 
-Let's add all those constraints to our Gurobi Python model:
+#### Non-negativity, Integrality, & Binary Constraints
+
+These constraints ensure that the decision variables can only take on values that make sense in our model.
+
+$y_i \in \{0,1\} ~\forall ~i \in \{1,2,3,4\}$ $~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~$} Binary Constraints
+$x_{ij} \ge 0 ~\forall ~i \in \{1,2,3,4,9\}, ~j \in \{5,6,7,8\}$ $~~~~~~~~$} Non-negativity Constraints
+$x_{ij} \in \mathbb{Z} ~\forall ~i \in \{1,2,3,4,9\}, ~j \in \{5,6,7,8\}$ $~~~~~~~~$} Integrality Constraints
+
+We have already set the Non-negativity, Integrality, & Binary Constraints in our model while we were creating the decision variables. Now, we shall add the rest of the constraints to our model:
 
 ```{python}
 # Adding the constraints to the model

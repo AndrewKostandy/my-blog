@@ -18,7 +18,8 @@ header:
 <script src="/rmarkdown-libs/kePrint/kePrint.js"></script>
 
 
-<p>Businesses face various types of problems that require making optimal decisions in order to achieve a certain objective. In this post, I will discuss a supply source &amp; route selection problem scenario and how network modeling with linear programming can be used to identify the optimal decisions that would minimize the cost of shipping. I will use Gurobi Python to model &amp; solve this problem.</p>
+<p>Businesses face various types of problems that require making optimal decisions in order to achieve a certain objective. One such problem is the Transportation / Assignment problem I came across when I was reading the excellent “Spreadsheet Modeling and Decision Analysis” book by Cliff T. Ragsdale. I found this type of problem interesting because the concept can be generalized to many areas of the business.</p>
+<p>In this post, I will discuss a Transportation / Assignment problem scenario where we need to select the optimal supply sources &amp; routes that would meet as much of the demand as possible while minimize the cost of shipping. I will use network modeling &amp; linear programming with Gurobi Python to model &amp; solve this problem.</p>
 <p>An electronics company has decided to build 3 factories for its flagship product. There are 4 cities being considered as locations for those factories — Boston, Miami, Seattle, and Los Angeles. A maximum of one factory can be built in a city and each factory option has a different production capacity.</p>
 <p>Additionally, the company has identified 4 cities with high demand for its products — Minneapolis, Chicago, Denver, and Dallas. The shipping cost per unit differs depending on the origin &amp; destination cities.</p>
 <p>The production capacities, demand levels, &amp; shipping costs are in the table below:</p>
@@ -29,7 +30,7 @@ header:
 </th>
 <th style="border-bottom:hidden; padding-bottom:0; padding-left:3px;padding-right:3px;text-align: center; " colspan="4">
 <div style="border-bottom: 1px solid #ddd; padding-bottom: 5px;">
-Factory Options
+Supply City Options
 </div>
 </th>
 <th style="border-bottom:hidden" colspan="1">
@@ -37,7 +38,7 @@ Factory Options
 </tr>
 <tr>
 <th style="text-align:left;">
-Shops
+Demand Cities
 </th>
 <th style="text-align:right;">
 Boston
@@ -139,7 +140,7 @@ $17
 </tr>
 <tr>
 <td style="text-align:left;font-weight: bold;">
-Production
+Supply
 </td>
 <td style="text-align:right;font-weight: bold;">
 3500
@@ -245,7 +246,12 @@ m.update() # Updating the model            </code></pre>
 <p>Looking at the above inequalities, note that since supply is a negative number, this forces the binary variable for a supply node to become 1 if any of that node’s routes is set to carry any units.</p>
 <p>Next, to ensure that 3 supply nodes only are selected we need to add the following constraint:</p>
 <p><span class="math inline">\(y_1 + y_2 + y_3 + y_4 = 3\)</span></p>
-<p>Let’s add all those constraints to our Gurobi Python model:</p>
+</div>
+<div id="non-negativity-integrality-binary-constraints" class="section level4">
+<h4>Non-negativity, Integrality, &amp; Binary Constraints</h4>
+<p>These constraints ensure that the decision variables can only take on values that make sense in our model.</p>
+<p><span class="math inline">\(y_i \in \{0,1\} ~\forall ~i \in \{1,2,3,4\}\)</span> <span class="math inline">\(~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\)</span>} Binary Constraints <span class="math inline">\(x_{ij} \ge 0 ~\forall ~i \in \{1,2,3,4,9\}, ~j \in \{5,6,7,8\}\)</span> <span class="math inline">\(~~~~~~~~\)</span>} Non-negativity Constraints <span class="math inline">\(x_{ij} \in \mathbb{Z} ~\forall ~i \in \{1,2,3,4,9\}, ~j \in \{5,6,7,8\}\)</span> <span class="math inline">\(~~~~~~~~\)</span>} Integrality Constraints</p>
+<p>We have already set the Non-negativity, Integrality, &amp; Binary Constraints in our model while we were creating the decision variables. Now, we shall add the rest of the constraints to our model:</p>
 <pre class="python"><code># Adding the constraints to the model
 m.addConstr(-x15 - x16 - x17 - x18&gt;=-3500, &quot;c1&quot;) # Constraint for node 1
 m.addConstr(-x25 - x26 - x27 - x28&gt;=-5000, &quot;c2&quot;) # Constraint for node 2
@@ -291,7 +297,7 @@ m.update() # Updating the model            </code></pre>
 ##   RHS range        [3e+00, 1e+05]
 ## Found heuristic solution: objective 2.149785e+08
 ## Presolve removed 5 rows and 0 columns
-## Presolve time: 0.01s
+## Presolve time: 0.00s
 ## Presolved: 9 rows, 24 columns, 44 nonzeros
 ## Variable types: 0 continuous, 24 integer (4 binary)
 ## 
@@ -302,7 +308,7 @@ m.update() # Updating the model            </code></pre>
 ## 
 ## *    0     0               0    6.525850e+07 6.5258e+07  0.00%     -    0s
 ## 
-## Explored 0 nodes (15 simplex iterations) in 0.03 seconds
+## Explored 0 nodes (15 simplex iterations) in 0.00 seconds
 ## Thread count was 8 (of 8 available processors)
 ## 
 ## Solution count 2: 6.52585e+07 2.14978e+08 
