@@ -53,7 +53,7 @@ We need to decide which 3 cities should be selected for the factories as well as
 
 The information in the above table can be visualized as a network plot. The production capacity values of the supply nodes are represented by negative values while the demand values of the demand cities are represented by positive values.
 
-![](/post/2018-06-19-source-route-selection-with-linear-programming_files/network_plot.png)
+![](/post/2018-06-19-source-route-selection-with-linear-programming_files/network_plot1.png)
 
 Note that we're not just trying to distribute our supply at the cheapest cost possible but rather trying to meet as much of the demand as possible with the least shipping costs. 
 
@@ -226,7 +226,7 @@ The above decision variable values allow us to meet as much of the demand as pos
 
 The network given by the solution can be seen in the network plot below:
 
-![](/post/2018-06-19-source-route-selection-with-linear-programming_files/network_plot5.png)
+![](/post/2018-06-19-source-route-selection-with-linear-programming_files/network_plot3.png)
 
 I hope you enjoyed this post. Please leave your comments below.
 
