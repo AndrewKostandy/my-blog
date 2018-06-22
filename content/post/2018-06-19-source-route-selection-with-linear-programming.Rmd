@@ -240,3 +240,9 @@ The above decision variable values allow us to meet as much of the demand as pos
 The network given by the solution can be seen in the network plot below:
 
 ![](/post/2018-06-19-source-route-selection-with-linear-programming_files/network_plot3.png)
+
+Extensions to the techniques shown here can be used to solve other types of problems including Transhipment problems and Shortest Path problems. Additionally, non-linear programming can be used when the objective functions and/or constraints are non-linear.
+
+Have you come across similar problems in your line of work where using these techniques is needed to reach the optimal solution?
+
+Please share your thoughts in the comments.
