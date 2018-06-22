@@ -5,6 +5,12 @@
 # End your URL with a `/` trailing slash, e.g. `https://example.com/`.
 baseurl = "/"
 
+# Enable comments by entering your Disqus shortname
+disqusShortname = "akostandy"
+
+# Enable analytics by entering your Google Analytics tracking ID
+googleAnalytics = "UA-121245937-1"
+
 # Title of your site
 title = "Andrew Kostandy's Blog"
 
@@ -19,11 +25,7 @@ ignoreFiles = ["\\.Rmd$", "\\.Rmarkdown$", "_files$", "_cache$"]
 preserveTaxonomyNames = true
 paginate = 10
 
-# Enable comments by entering your Disqus shortname
-disqusShortname = "akostandy"
-
-# Enable analytics by entering your Google Analytics tracking ID
-googleAnalytics = "UA-121245937-1"
+# Original location of Disqus and GA
 
 # Default language to use (if you setup multilingual support)
 defaultContentLanguage = "en"
