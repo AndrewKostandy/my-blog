@@ -240,6 +240,3 @@ The above decision variable values allow us to meet as much of the demand as pos
 The network given by the solution can be seen in the network plot below:
 
 ![](/post/2018-06-19-source-route-selection-with-linear-programming_files/network_plot3.png)
-
-I hope you enjoyed this post. Please leave your comments below.
-
