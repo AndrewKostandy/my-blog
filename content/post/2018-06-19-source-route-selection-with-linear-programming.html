@@ -19,7 +19,7 @@ header:
 
 
 <p>Businesses face various types of problems that require making optimal decisions in order to achieve a certain objective. One such problem is the Transportation / Assignment problem I came across when I was reading the excellent “Spreadsheet Modeling and Decision Analysis” book by Cliff T. Ragsdale. I found this type of problem interesting because the concept can be generalized to many areas of the business.</p>
-<p>In this post, I will discuss a Transportation / Assignment problem scenario where we need to select the optimal supply sources &amp; routes that would meet as much of the demand as possible while minimize the cost of shipping. I will use network modeling &amp; linear programming with Gurobi Python to model &amp; solve this problem.</p>
+<p>In this post, I will discuss a Transportation / Assignment problem scenario where we need to select the optimal supply sources &amp; routes that would meet as much of the demand as possible while minimizing the cost of shipping. I will use network modeling &amp; linear programming with Gurobi Python to model &amp; solve this problem.</p>
 <p>An electronics company has decided to build 3 factories for its flagship product. There are 4 cities being considered as locations for those factories — Boston, Miami, Seattle, and Los Angeles. A maximum of one factory can be built in a city and each factory option has a different production capacity.</p>
 <p>Additionally, the company has identified 4 cities with high demand for its products — Minneapolis, Chicago, Denver, and Dallas. The shipping cost per unit differs depending on the origin &amp; destination cities.</p>
 <p>The production capacities, demand levels, &amp; shipping costs are in the table below:</p>
@@ -329,7 +329,7 @@ m.update() # Updating the model            </code></pre>
 ##          x95         4500 
 ##          x96         2000</code></pre>
 <p>The above solution shows that Miami, Seattle, and Los Angeles (nodes, 2,3,4) have been selected as the 3 supply nodes. We can also see that some routes from those supply nodes were assigned values while others were not. The artificial supply node was also used to fulfill some demand — routes <span class="math inline">\(x_{95}\)</span> and <span class="math inline">\(x_{96}\)</span>. We should ignore the values related to the artificial node as well as the objective function value in the output since the model only used them to be able to fulfill the demand we could not cover with our real supply. Additionally, the results above show that we could not cover Minneapolis as no routes from Miami, Seattle, or Los Angeles to Minneapolis were assigned positive values. It was simply not economical to fulfill Minneapolis’s demand given that the demand of cities closer to the supply nodes would already exhaust the entire supply of the supply nodes. Chicago’s demand was not even fully met.</p>
-<p>The above decision variable values allow us to meet as much of the demand as possible (15000 units) at the lowest cost of shipping: <span class="math inline">\(20*5000 + 16*4000 + 15*500 + 17*5500=\$170,020\)</span>.</p>
+<p>The above decision variable values allow us to meet as much of the demand as possible (15000 units) at the lowest cost of shipping: <span class="math inline">\(20*5000 + 16*4000 + 15*500 + 17*5500=\)</span> $170,020.</p>
 <p>The network given by the solution can be seen in the network plot below:</p>
 <div class="figure">
 <img src="/post/2018-06-19-source-route-selection-with-linear-programming_files/network_plot3.png" />
