@@ -297,7 +297,7 @@ m.update() # Updating the model            </code></pre>
 ##   RHS range        [3e+00, 1e+05]
 ## Found heuristic solution: objective 2.149785e+08
 ## Presolve removed 5 rows and 0 columns
-## Presolve time: 0.01s
+## Presolve time: 0.04s
 ## Presolved: 9 rows, 24 columns, 44 nonzeros
 ## Variable types: 0 continuous, 24 integer (4 binary)
 ## 
@@ -308,7 +308,7 @@ m.update() # Updating the model            </code></pre>
 ## 
 ## *    0     0               0    6.525850e+07 6.5258e+07  0.00%     -    0s
 ## 
-## Explored 0 nodes (15 simplex iterations) in 0.03 seconds
+## Explored 0 nodes (15 simplex iterations) in 0.13 seconds
 ## Thread count was 8 (of 8 available processors)
 ## 
 ## Solution count 2: 6.52585e+07 2.14978e+08 
@@ -335,7 +335,7 @@ m.update() # Updating the model            </code></pre>
 <img src="/post/2018-06-19-source-route-selection-with-linear-programming_files/network_plot3.png" />
 
 </div>
-<p>Extensions to the techniques shown here can be used to solve other types of problems including Transhipment problems and Shortest Path problems. Additionally, non-linear programming can be used when the objective functions and/or constraints are non-linear.</p>
+<p>Extensions to the techniques shown here can be used to solve other types of problems including Transhipment problems (where some nodes can both send and receive units from other nodes) and Shortest Path problems (where the objective is to find the shortest path from an origin node to a destination node with multiple nodes and route options between them). Additionally, non-linear programming can be used when the objective functions and/or constraints are non-linear.</p>
 <p>Have you come across similar problems in your line of work where using these techniques is needed to reach the optimal solution?</p>
 <p>Please share your thoughts in the comments.</p>
 </div>
