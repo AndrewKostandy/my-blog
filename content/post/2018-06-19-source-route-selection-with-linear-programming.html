@@ -308,7 +308,7 @@ m.update() # Updating the model            </code></pre>
 ## 
 ## *    0     0               0    6.525850e+07 6.5258e+07  0.00%     -    0s
 ## 
-## Explored 0 nodes (15 simplex iterations) in 0.02 seconds
+## Explored 0 nodes (15 simplex iterations) in 0.03 seconds
 ## Thread count was 8 (of 8 available processors)
 ## 
 ## Solution count 2: 6.52585e+07 2.14978e+08 
@@ -329,7 +329,7 @@ m.update() # Updating the model            </code></pre>
 ##          x95         4500 
 ##          x96         2000</code></pre>
 <p>The above solution shows that Miami, Seattle, and Los Angeles (nodes, 2,3,4) have been selected as the 3 supply nodes. We can also see that some routes from those supply nodes were assigned values while others were not. The artificial supply node was also used to fulfill some demand — routes <span class="math inline">\(x_{95}\)</span> and <span class="math inline">\(x_{96}\)</span>. We should ignore the values related to the artificial node as well as the objective function value in the output since the model only used them to be able to fulfill the demand we could not cover with our real supply. Additionally, the results above show that we could not cover Minneapolis as no routes from Miami, Seattle, or Los Angeles to Minneapolis were assigned positive values. It was simply not economical to fulfill Minneapolis’s demand given that the demand of cities closer to the supply nodes would already exhaust the entire supply of the supply nodes. Chicago’s demand was not even fully met.</p>
-<p>The above decision variable values allow us to meet as much of the demand as possible (15000 units) at the lowest cost of shipping: <span class="math inline">\(20*5000 + 16*4000 + 15*500 + 17*5500=\)</span> $170,020.</p>
+<p>The above decision variable values allow us to meet as much of the demand as possible (15000 units) at the lowest cost of shipping: <span class="math inline">\(20*5000 + 16*4000 + 15*500 + 17*5500=\)</span> $265,000.</p>
 <p>The network given by the solution can be seen in the network plot below:</p>
 <div class="figure">
 <img src="/post/2018-06-19-source-route-selection-with-linear-programming_files/network_plot3.png" />
