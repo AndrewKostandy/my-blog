@@ -18,8 +18,8 @@ header:
 <script src="/rmarkdown-libs/kePrint/kePrint.js"></script>
 
 
-<p>Businesses face various types of problems that require making optimal decisions in order to achieve a certain objective. One such problem is the Transportation / Assignment problem I came across when I was reading the excellent “Spreadsheet Modeling and Decision Analysis” book by Cliff T. Ragsdale. I found this type of problem interesting because the concept can be generalized to many areas of the business.</p>
-<p>In this post, I will discuss a Transportation / Assignment problem scenario where we need to select the optimal supply sources &amp; routes that would meet as much of the demand as possible while minimizing the cost of shipping. I will use network modeling &amp; linear programming with Gurobi Python to model &amp; solve this problem.</p>
+<p>Businesses face various types of problems that require making optimal decisions in order to achieve a certain objective. One such problem is the transportation / assignment problem I came across when I was reading the excellent “Spreadsheet Modeling and Decision Analysis” book by Cliff T. Ragsdale. I found this type of problem interesting because the concept can be generalized to many areas of the business.</p>
+<p>In this post, I will discuss a transportation / assignment problem scenario where we need to select the optimal supply sources &amp; routes that would meet as much of the demand as possible while minimizing the cost of shipping. I will use network modeling &amp; linear programming with Gurobi Python to model &amp; solve this problem.</p>
 <p>An electronics company has decided to build 3 factories for its flagship product. There are 4 cities being considered as locations for those factories — Boston, Miami, Seattle, and Los Angeles. A maximum of one factory can be built in a city and each factory option has a different production capacity.</p>
 <p>Additionally, the company has identified 4 cities with high demand for its products — Minneapolis, Chicago, Denver, and Dallas. The shipping cost per unit differs depending on the origin &amp; destination cities.</p>
 <p>The production capacities, demand levels, &amp; shipping costs are in the table below:</p>
@@ -178,9 +178,11 @@ Supply
 <p>Let’s formulate the model mathematically and build the model with Gurobi Python.</p>
 <div id="decision-variables" class="section level3">
 <h3>Decision Variables</h3>
-<p>There are two groups of decision variables needed here. First, a group of binary decision variables, one for each of the supply cities that would take a value of 1 if that city is selected and 0 otherwise. Second, a group of integer decision variables that represent the number of units to send for each possible route. If that value is 0, then the route will not be used. This can be represented mathematically as:</p>
-<p><span class="math inline">\(y_i ~\forall ~i \in \{1,2,3,4\}\)</span>: Binary variables that equal 1 if if node <span class="math inline">\(i\)</span> is selected as a supply node.</p>
-<p><span class="math inline">\(x_{ij} ~\forall ~i \in \{1,2,3,4,9\}, ~j \in \{5,6,7,8\}\)</span>: The number of units to send from supply node <span class="math inline">\(i\)</span> to demand node <span class="math inline">\(j\)</span>.</p>
+<p>There are two groups of decision variables needed here. First, a group of binary decision variables, one for each of the supply cities that would take a value of 1 if that city is selected and 0 otherwise. Second, a group of integer decision variables that represent the number of units to send for each possible route. If that value is 0, then the route will not be used. These can be represented mathematically as:</p>
+<p>Binary variables that equal 1 if if node <span class="math inline">\(i\)</span> is selected as a supply node:<br />
+<span class="math inline">\(y_i ~\forall ~i \in \{1,2,3,4\}\)</span></p>
+<p>The number of units to send from supply node <span class="math inline">\(i\)</span> to demand node <span class="math inline">\(j\)</span>:<br />
+<span class="math inline">\(x_{ij} ~\forall ~i \in \{1,2,3,4,9\}, ~j \in \{5,6,7,8\}\)</span>:</p>
 <p>Let’s create those decision variables in our Gurobi Python model:</p>
 <pre class="python"><code>from gurobi import *        
  
@@ -251,7 +253,7 @@ m.update() # Updating the model            </code></pre>
 <h4>Non-negativity, Integrality, &amp; Binary Constraints</h4>
 <p>These constraints ensure that the decision variables can only take on values that make sense in our model.</p>
 <p><span class="math inline">\(y_i \in \{0,1\} ~\forall ~i \in \{1,2,3,4\}\)</span> <span class="math inline">\(~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\)</span>} Binary Constraints <span class="math inline">\(x_{ij} \ge 0 ~\forall ~i \in \{1,2,3,4,9\}, ~j \in \{5,6,7,8\}\)</span> <span class="math inline">\(~~~~~~~~\)</span>} Non-negativity Constraints <span class="math inline">\(x_{ij} \in \mathbb{Z} ~\forall ~i \in \{1,2,3,4,9\}, ~j \in \{5,6,7,8\}\)</span> <span class="math inline">\(~~~~~~~~\)</span>} Integrality Constraints</p>
-<p>We have already set the Non-negativity, Integrality, &amp; Binary Constraints in our model while we were creating the decision variables. Now, we shall add the rest of the constraints to our model:</p>
+<p>We have already set the non-negativity, integrality, &amp; binary constraints in our model while we were creating the decision variables. Now, we shall add the rest of the constraints to our model:</p>
 <pre class="python"><code># Adding the constraints to the model
 m.addConstr(-x15 - x16 - x17 - x18&gt;=-3500, &quot;c1&quot;) # Constraint for node 1
 m.addConstr(-x25 - x26 - x27 - x28&gt;=-5000, &quot;c2&quot;) # Constraint for node 2
@@ -297,7 +299,7 @@ m.update() # Updating the model            </code></pre>
 ##   RHS range        [3e+00, 1e+05]
 ## Found heuristic solution: objective 2.149785e+08
 ## Presolve removed 5 rows and 0 columns
-## Presolve time: 0.04s
+## Presolve time: 0.00s
 ## Presolved: 9 rows, 24 columns, 44 nonzeros
 ## Variable types: 0 continuous, 24 integer (4 binary)
 ## 
@@ -308,7 +310,7 @@ m.update() # Updating the model            </code></pre>
 ## 
 ## *    0     0               0    6.525850e+07 6.5258e+07  0.00%     -    0s
 ## 
-## Explored 0 nodes (15 simplex iterations) in 0.13 seconds
+## Explored 0 nodes (15 simplex iterations) in 0.00 seconds
 ## Thread count was 8 (of 8 available processors)
 ## 
 ## Solution count 2: 6.52585e+07 2.14978e+08 
@@ -335,7 +337,7 @@ m.update() # Updating the model            </code></pre>
 <img src="/post/2018-06-19-source-route-selection-with-linear-programming_files/network_plot3.png" />
 
 </div>
-<p>Extensions to the techniques shown here can be used to solve other types of problems including Transhipment problems (where some nodes can both send and receive units from other nodes) and Shortest Path problems (where the objective is to find the shortest path from an origin node to a destination node with multiple nodes and route options between them). Additionally, non-linear programming can be used when the objective functions and/or constraints are non-linear.</p>
+<p>Extensions to the techniques shown here can be used to solve other types of problems including transhipment problems (where some nodes can both send and receive units from other nodes) and shortest path problems (where the objective is to find the shortest path from an origin node to a destination node with multiple nodes and route options between them). Additionally, non-linear programming can be used when the objective functions and/or constraints are non-linear.</p>
 <p>Have you come across similar problems in your line of work where using these techniques is needed to reach the optimal solution?</p>
 <p>Please share your thoughts in the comments.</p>
 </div>

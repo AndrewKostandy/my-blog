@@ -24,7 +24,8 @@ weight = 1
 #  label = '<i class="fa fa-download"></i> Install Now'
 +++
 
-This is a blog about various data science topics. I hope you enjoy reading the posts and I look forward to reading your comments.
+Musings about data science in Python and R.<br/>
+Proceed with caution.
 <br>
 <!--<small><a id="academic-release" href="https://sourcethemes.com/academic/updates">Latest release</a></small>-->
 <br><br>
