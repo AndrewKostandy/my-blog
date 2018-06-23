@@ -15,10 +15,10 @@ header:
   image: ''
 ---
 
-Businesses face various types of problems that require making optimal decisions in order to achieve a certain objective. One such problem is the transportation / assignment problem I came across when I was reading the excellent "Spreadsheet Modeling and Decision Analysis" book by Cliff T. Ragsdale.
+Businesses face various types of problems that require making optimal decisions in order to achieve a certain objective. One such problem is the transportation / assignment problem I came across when I was reading the excellent "[Spreadsheet Modeling and Decision Analysis](https://www.amazon.com/Spreadsheet-Modeling-Decision-Analysis-Introduction/dp/130594741X/)" book by Cliff T. Ragsdale.
 I found this type of problem interesting because the concept can be generalized to many areas of the business.
 
-In this post, I will discuss a transportation / assignment problem scenario where we need to select the optimal supply sources & routes that would meet as much of the demand as possible while minimizing the cost of shipping. I will use network modeling & linear programming with Gurobi Python to model & solve this problem.
+In this post, I will discuss a transportation / assignment problem scenario where we need to select the optimal supply sources & routes that would meet as much of the demand as possible while minimizing the cost of shipping. I will use network modeling & linear programming with [Gurobi](http://www.gurobi.com/) Python to model & solve this problem.
 
 An electronics company has decided to build 3 factories for its flagship product. There are 4 cities being considered as locations for those factories — Boston, Miami, Seattle, and Los Angeles. A maximum of one factory can be built in a city and each factory option has a different production capacity.
 
@@ -54,7 +54,9 @@ Notice that the total demand of the demand cities exceeds the total supply of al
 
 We need to decide which 3 cities should be selected for the factories as well as which routes should be used from each of them (& the number of units to ship) in order to minimize the cost of shipping while meeting as much of the demand as possible.
 
-The information in the above table can be visualized as a network plot. The production capacity values of the supply nodes are represented by negative values while the demand values of the demand cities are represented by positive values.
+The information in the above table can be visualized as a network plot. We'll use [visNetwork](https://datastorm-open.github.io/visNetwork/) which is a great R package for interactive network visualization.
+
+The production capacity values of the supply nodes are represented by negative values while the demand values of the demand cities are represented by positive values.
 
 ![](/post/2018-06-19-source-route-selection-with-linear-programming_files/network_plot1.png)
 
