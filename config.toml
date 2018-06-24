@@ -275,6 +275,11 @@ defaultContentLanguageInSubdir = false
   name = "Projects"
   url = "#projects"
   weight = 3
+  
+  [[menu.main]]
+  name = "RSS"
+  url = "#rss"
+  weight = 5
 
 #[[menu.main]]
   #name = "Teaching"
