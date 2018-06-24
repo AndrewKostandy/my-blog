@@ -1,7 +1,7 @@
 ---
 title: Supply Source & Route Selection with Linear Programming
 author: Andrew Kostandy
-date: '2018-06-19'
+date: '2018-06-24'
 slug: supply-source-and-route-selection-with-linear-programming
 categories: []
 tags:
