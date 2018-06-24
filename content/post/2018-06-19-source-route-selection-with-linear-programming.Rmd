@@ -54,7 +54,7 @@ Notice that the total demand of the demand cities exceeds the total supply of al
 
 We need to decide which 3 cities should be selected for the factories as well as which routes should be used from each of them (& the number of units to ship) in order to minimize the cost of shipping while meeting as much of the demand as possible.
 
-The information in the above table can be visualized as a network plot. We'll use [visNetwork](https://datastorm-open.github.io/visNetwork/) which is a great R package for interactive network visualization.
+The information in the above table can be visualized as a network plot. We'll use [visNetwork](https://datastorm-open.github.io/visNetwork/), which is a great R package for interactive network visualization.
 
 The production capacity values of the supply nodes are represented by negative values while the demand values of the demand cities are represented by positive values.
 

@@ -161,7 +161,7 @@ Supply
 </table>
 <p>Notice that the total demand of the demand cities exceeds the total supply of all 4 potential factories of which we can only select 3.</p>
 <p>We need to decide which 3 cities should be selected for the factories as well as which routes should be used from each of them (&amp; the number of units to ship) in order to minimize the cost of shipping while meeting as much of the demand as possible.</p>
-<p>The information in the above table can be visualized as a network plot. We’ll use <a href="https://datastorm-open.github.io/visNetwork/">visNetwork</a> which is a great R package for interactive network visualization.</p>
+<p>The information in the above table can be visualized as a network plot. We’ll use <a href="https://datastorm-open.github.io/visNetwork/">visNetwork</a>, which is a great R package for interactive network visualization.</p>
 <p>The production capacity values of the supply nodes are represented by negative values while the demand values of the demand cities are represented by positive values.</p>
 <div class="figure">
 <img src="/post/2018-06-19-source-route-selection-with-linear-programming_files/network_plot1.png" />
@@ -300,7 +300,7 @@ m.update() # Updating the model            </code></pre>
 ##   RHS range        [3e+00, 1e+05]
 ## Found heuristic solution: objective 2.149785e+08
 ## Presolve removed 5 rows and 0 columns
-## Presolve time: 0.02s
+## Presolve time: 0.01s
 ## Presolved: 9 rows, 24 columns, 44 nonzeros
 ## Variable types: 0 continuous, 24 integer (4 binary)
 ## 
@@ -311,7 +311,7 @@ m.update() # Updating the model            </code></pre>
 ## 
 ## *    0     0               0    6.525850e+07 6.5258e+07  0.00%     -    0s
 ## 
-## Explored 0 nodes (15 simplex iterations) in 0.05 seconds
+## Explored 0 nodes (15 simplex iterations) in 0.04 seconds
 ## Thread count was 8 (of 8 available processors)
 ## 
 ## Solution count 2: 6.52585e+07 2.14978e+08 
