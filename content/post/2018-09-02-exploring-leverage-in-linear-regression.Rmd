@@ -14,7 +14,7 @@ header:
   image: ''
 ---
 
-In the context of linear regression, leverage is a distance measure that shows how far an observation is from the center of the multivariate predictor space. Observations with high leverage values would have the **potential** to influence the regression model highly while observations with low leverage values would not. 
+In the context of linear regression, leverage is a distance measure that shows how far an observation is from the center of the multivariate predictor space. Observations with high leverage values would have the **potential** to influence the regression model highly while observations with low leverage values would not. Additionally, leverage can be used to determine if a new observation is close to the predictor space of the observations used to create the model in order to avoid extrapolation.
 
 Once a linear regression model is created, the diagonal values of the hat matrix represent the leverage of all the observations used to build the model. However, leverage as a measure of distance is not Euclidean, so we shouldn't expect the distance to be a straight line to the center of the predictor space. Instead, leverage takes into consideration the predictor correlations and is therefore able to detect multivariate outliers — which are outliers in the full predictor space taken together though they may not be outliers for any predictors individually.
 
