@@ -27,47 +27,47 @@ df &lt;- tibble(x1=c(1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,11,25),
              y=c(1,3,2,4.3,5.3,7.3,6.1,8.8,9.3,10.9,11.1,12.5,13.2,14.9,15.8,5,25.4),
              obs=1:17)
 
-ggplot(df, aes(x1,x2)) + geom_point() +
-  geom_label(aes(label=obs), nudge_y = 2) +
-  scale_x_continuous(breaks = seq(0,30,5)) +
-  scale_y_continuous(breaks = seq(0,30,5)) +
+ggplot(df, aes(x1, x2)) + geom_point() +
+  geom_label(aes(label = obs), nudge_y = 2) +
+  scale_x_continuous(breaks = seq(0, 30, 5)) +
+  scale_y_continuous(breaks = seq(0, 30, 5)) +
   labs(title = &quot;Our Predictor Space&quot;, x = expression(&quot;x&quot;[1]), y = expression(&quot;x&quot;[2]))</code></pre>
 <p><img src="/post/2018-09-02-exploring-leverage-in-linear-regression_files/figure-html/unnamed-chunk-1-1.png" width="672" /></p>
 <p>Notice that observation 16 above is not an outlier in the <span class="math inline">\(x_1\)</span> space by itself or in the <span class="math inline">\(x_2\)</span> space by itself. However, it is a multivariate outlier in the predictor space of <span class="math inline">\(x_1\)</span> and <span class="math inline">\(x_2\)</span> together since it’s out of the “oval” region that those 2 predictors have together which is represented below with a 95% confidence level ellipse for demonstrative purposes:</p>
-<pre class="r"><code>ggplot(df, aes(x1,x2)) + geom_point() +
-  geom_label(aes(label=obs), nudge_y = 3) +
-  scale_x_continuous(breaks = seq(-5,30,5)) +
-  scale_y_continuous(breaks = seq(-5,30,5)) +
+<pre class="r"><code>ggplot(df, aes(x1, x2)) + geom_point() +
+  geom_label(aes(label = obs), nudge_y = 3) +
+  scale_x_continuous(breaks = seq(-5, 30, 5)) +
+  scale_y_continuous(breaks = seq(-5, 30, 5)) +
   stat_ellipse(level = 0.95) +
-  labs(title=&quot;Our Predictor Space&quot;, x = expression(&quot;x&quot;[1]), y = expression(&quot;x&quot;[2]))</code></pre>
+  labs(title = &quot;Our Predictor Space&quot;, x = expression(&quot;x&quot;[1]), y = expression(&quot;x&quot;[2]))</code></pre>
 <p><img src="/post/2018-09-02-exploring-leverage-in-linear-regression_files/figure-html/unnamed-chunk-2-1.png" width="672" /></p>
 <p>Observation 17 above on the other hand is an outlier in both the <span class="math inline">\(x_1\)</span> and <span class="math inline">\(x_2\)</span> predictor spaces separately and also an outlier to the region of both predictors together since it’s far away from the center of the multivariate predictor space despite being true to the correlation relationship between the predictors.</p>
 <p>Now let’s fit a linear model between a third variable <span class="math inline">\(y\)</span> as the outcome and our variables <span class="math inline">\(x_1\)</span> and <span class="math inline">\(x_2\)</span> as predictors. The model equation will therefore be: <span class="math display">\[\hat{y} = b_0 + b_1x_1 + b_2x_2\]</span></p>
 <p>Below is a bar plot showing the leverage of the observations in the model:</p>
-<pre class="r"><code>model &lt;- lm(y~x1+x2, data=df)
+<pre class="r"><code>model &lt;- lm(y ~ x1 + x2, data=df)
 
-lev_obs &lt;- tibble(leverage=hatvalues(model), obs=1:17)
+lev_obs &lt;- tibble(leverage = hatvalues(model), obs = 1:17)
 
 ggplot(lev_obs, aes(obs,leverage)) + geom_col() +
-  scale_x_continuous(breaks = seq(1,17)) +
+  scale_x_continuous(breaks = seq(1, 17)) +
   labs(title = &quot;Observation Leverage Values&quot;, x = &quot;Observation&quot;, y = &quot;Leverage&quot;)</code></pre>
 <p><img src="/post/2018-09-02-exploring-leverage-in-linear-regression_files/figure-html/unnamed-chunk-3-1.png" width="672" /></p>
 <p>Notice how the leverage metric (from the diagonal of the hat matrix) was able to successfully detect that both observations 16 and 17 were far from center of the multivariate oval region of the predictors.</p>
 <p>Observations that are not outliers for the predictors individually but are outliers for the predictors when taken together (the oval) will still be detected by the leverage metric. Therefore, when we have a new observation that we want to predict (<span class="math inline">\(h_0\)</span>), we need to make sure that its leverage is less than the maximum leverage value (<span class="math inline">\(h_{max}\)</span>) used in the model to ensure it’s within the multivariate predictor region covered by the model and that no extrapolation will take place.</p>
 <p>Tangentially, the Mahalanobis distance is a similar distance measure that we can use for the same purpose as it can also measure distances from the center of multivariate predictor regions where predictor correlations are also taken into account. It is also very easy to calculate for new observations and compare to the Mahalanobis distances of the observations used in a model.</p>
 <p>Below are the Mahalanobis distances of our example above:</p>
-<pre class="r"><code>df_temp &lt;- df %&gt;% select(x1,x2)
+<pre class="r"><code>df_temp &lt;- df %&gt;% select(x1, x2)
 
 means &lt;- colMeans(df_temp)
 cov_matrix &lt;- cov(df_temp)
 
 mahalanbis_distances &lt;- mahalanobis(df_temp, means, cov_matrix)
 
-mh &lt;- tibble(obs=1:17, maha = mahalanbis_distances)
+mh &lt;- tibble(obs = 1:17, maha = mahalanbis_distances)
 
 
-ggplot(mh, aes(obs,maha)) + geom_col() +
-  scale_x_continuous(breaks = seq(1,17)) +
+ggplot(mh, aes(obs, maha)) + geom_col() +
+  scale_x_continuous(breaks = seq(1, 17)) +
   labs(title = &quot;Observation Mahalanobis Distance Values&quot;,
        x = &quot;Observation&quot;, y = &quot;Mahalanobis Distance&quot;)</code></pre>
 <p><img src="/post/2018-09-02-exploring-leverage-in-linear-regression_files/figure-html/unnamed-chunk-4-1.png" width="672" /></p>
