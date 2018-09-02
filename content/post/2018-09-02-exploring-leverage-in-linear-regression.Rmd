@@ -54,11 +54,11 @@ Now let's fit a linear model between a third variable $y$ as the outcome and our
 Below is a bar plot showing the leverage of the observations in the model:
 
 ```{r}
-model <- lm(y ~ x1 + x2, data=df)
+model <- lm(y ~ x1 + x2, data = df)
 
 lev_obs <- tibble(leverage = hatvalues(model), obs = 1:17)
 
-ggplot(lev_obs, aes(obs,leverage)) + geom_col() +
+ggplot(lev_obs, aes(obs, leverage)) + geom_col() +
   scale_x_continuous(breaks = seq(1, 17)) +
   labs(title = "Observation Leverage Values", x = "Observation", y = "Leverage")
 ```

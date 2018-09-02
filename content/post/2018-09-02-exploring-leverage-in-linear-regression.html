@@ -44,11 +44,11 @@ ggplot(df, aes(x1, x2)) + geom_point() +
 <p>Observation 17 above on the other hand is an outlier in both the <span class="math inline">\(x_1\)</span> and <span class="math inline">\(x_2\)</span> predictor spaces separately and also an outlier to the region of both predictors together since it’s far away from the center of the multivariate predictor space despite being true to the correlation relationship between the predictors.</p>
 <p>Now let’s fit a linear model between a third variable <span class="math inline">\(y\)</span> as the outcome and our variables <span class="math inline">\(x_1\)</span> and <span class="math inline">\(x_2\)</span> as predictors. The model equation will therefore be: <span class="math display">\[\hat{y} = b_0 + b_1x_1 + b_2x_2\]</span></p>
 <p>Below is a bar plot showing the leverage of the observations in the model:</p>
-<pre class="r"><code>model &lt;- lm(y ~ x1 + x2, data=df)
+<pre class="r"><code>model &lt;- lm(y ~ x1 + x2, data = df)
 
 lev_obs &lt;- tibble(leverage = hatvalues(model), obs = 1:17)
 
-ggplot(lev_obs, aes(obs,leverage)) + geom_col() +
+ggplot(lev_obs, aes(obs, leverage)) + geom_col() +
   scale_x_continuous(breaks = seq(1, 17)) +
   labs(title = &quot;Observation Leverage Values&quot;, x = &quot;Observation&quot;, y = &quot;Leverage&quot;)</code></pre>
 <p><img src="/post/2018-09-02-exploring-leverage-in-linear-regression_files/figure-html/unnamed-chunk-3-1.png" width="672" /></p>
