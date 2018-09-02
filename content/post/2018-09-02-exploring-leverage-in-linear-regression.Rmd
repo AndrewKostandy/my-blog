@@ -72,7 +72,7 @@ Tangentially, the Mahalanobis distance is a similar distance measure that we can
 Below are the Mahalanobis distances of our example above:
 
 ```{r}
-df_temp <- df %>% select(x1, x2)
+df_temp <- select(df, x1, x2)
 
 means <- colMeans(df_temp)
 cov_matrix <- cov(df_temp)
