@@ -20,7 +20,7 @@ weight = 4
 # List your qualifications (such as academic degrees).
 
 [[education.courses]]
-  course = "Master of Science in Data Science, 2019 (Expected)"
+  course = "Master of Science in Data Science, Specialization: Artificial Intelligence, 2019 (Expected)"
   institution = "Northwestern University"
   year = ""
 
