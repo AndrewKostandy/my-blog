@@ -9,7 +9,7 @@ title = "MLtoolkit"
 summary = "An R package to help with machine learning & feature engineering tasks."
 
 # Optional image to display on homepage (relative to `static/img/` folder).
-image_preview = "MLtoolkit.svg"
+image_preview = "MLtoolkit.png"
 
 # Tags: can be used for filtering projects.
 # Example: `tags = ["machine-learning", "deep-learning"]`
