@@ -12,6 +12,9 @@ weight = 4
   interests = [
     "Data Science",
     "Machine Learning",
+    "Deep Learning",
+    "Marketing Analytics",
+    "NLP",
     "Statistics",
     "Decision Analytics",
     "Data Visualization"
@@ -20,17 +23,17 @@ weight = 4
 # List your qualifications (such as academic degrees).
 
 [[education.courses]]
-  course = "Master of Science in Data Science, Specialization: Artificial Intelligence, 2019 (Expected)"
-  institution = "Northwestern University"
-  year = ""
+  course = "Master of Science in Data Science (AI Specialization)"
+  institution = "Northwestern University, School of Professional Studies"
+  year = 2019
 
 [[education.courses]]
   course = "Professional Graduate-Level Certificate in Data Science"
-  institution = "Harvard University Extension School"
+  institution = "Harvard University, Extension School"
   year = 2018
 
 [[education.courses]]
-  course = "Bachelor in Computer Science, Specialization: Software Development"
+  course = "Bachelor in Computer Science (Software Development Specialization)"
   institution = "University of Wollongong"
   year = 2005
  
