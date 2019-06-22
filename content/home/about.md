@@ -41,4 +41,4 @@ weight = 4
 
 # Mini Biography
 
-Andrew Kostandy grew up and currently lives in Dubai. He had a 9-year career in IBM that included analytics software sales, business development, and marketing. In 2015, he discovered a passion for data science and has been studying it since.
+Data Scientist with a stellar academic and business background. Graduate of both Northwestern and Harvard universities, with over 9 years of hands-on business experience at IBM.
