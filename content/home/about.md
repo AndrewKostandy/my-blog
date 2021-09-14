@@ -41,4 +41,4 @@ weight = 4
 
 # Mini Biography
 
-Data Scientist with a stellar academic and business background. Graduate of both Northwestern and Harvard universities, with over 9 years of hands-on business experience at IBM.
+Data Scientist with a stellar academic and business background. I enjoy coming up with creative solutions that are closely tailored to the problem at hand.
