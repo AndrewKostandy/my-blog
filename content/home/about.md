@@ -41,5 +41,4 @@ weight = 4
 
 # Mini Biography
 
-Data Scientist with a stellar academic and business background.
-I enjoy coming up with creative solutions that are closely tailored to the problem at hand.
+Data Scientist with a stellar academic and business background. I enjoy coming up with creative solutions that are closely tailored to the problem at hand.
